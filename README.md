@@ -12,11 +12,11 @@ The platform follows a decoupled Client-Server architecture pattern:
 
 ```mermaid
 graph TD
-    Client[React Frontend (Vite)] -->|HTTP Requests| API[FastAPI Gateway]
+    Client["React Frontend (Vite)"] -->|HTTP Requests| API["FastAPI Gateway"]
     API -->|JSON Responses| Client
-    API -->|SQL queries| DB[(SQLite / PostgreSQL DB)]
+    API -->|SQL queries| DB[("SQLite / PostgreSQL DB")]
     DB -->|Data| API
-    API -->|Ingests| Resource[backend/app/resources/*.json]
+    API -->|Ingests| Resource["backend/app/resources/*.json"]
 ```
 
 ### Relational Database Model
