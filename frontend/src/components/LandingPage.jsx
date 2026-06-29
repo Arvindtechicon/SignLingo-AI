@@ -5,10 +5,10 @@ export default function LandingPage({ onNavigate }) {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col justify-between">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-md border-b border-slate-200/80 py-4 px-6 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
+      <header className="sticky top-4 z-50 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4 w-full">
+        <div className="bg-white/80 backdrop-blur-md border border-slate-200/60 py-3.5 px-6 rounded-2xl flex justify-between items-center shadow-sm shadow-indigo-500/5">
           <div className="flex items-center">
-            <span className="text-xl font-bold tracking-tight text-slate-900">SignLingo AI</span>
+            <span className="text-xl font-extrabold tracking-tight bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">SignLingo AI</span>
           </div>
           <div className="space-x-4">
             <button onClick={() => onNavigate('login')} className="text-slate-600 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition">
