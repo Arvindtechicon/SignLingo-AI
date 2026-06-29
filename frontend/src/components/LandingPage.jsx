@@ -5,10 +5,9 @@ export default function LandingPage({ onNavigate }) {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col justify-between">
       {/* Header */}
-      <header className="bg-white border-b border-slate-200/80 py-4 px-6 sticky top-0 z-50">
+      <header className="bg-white/80 backdrop-blur-md border-b border-slate-200/80 py-4 px-6 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <div className="flex items-center space-x-2">
-            <GraduationCap className="h-8 w-8 text-indigo-600" />
+          <div className="flex items-center">
             <span className="text-xl font-bold tracking-tight text-slate-900">SignLingo AI</span>
           </div>
           <div className="space-x-4">
