@@ -21,3 +21,7 @@ frontend/.next/
 *.sw?
 .DS_Store
 Thumbs.db
+
+# Presentation Files
+milestone_1_presentation.md
+milestone_1_presentation.pptx

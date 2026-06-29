@@ -12,9 +12,11 @@ The platform follows a decoupled Client-Server architecture pattern:
 
 ```mermaid
 graph TD
-    Client[React Frontend (Vite)] <-->|JSON / HTTP Requests| API[FastAPI Gateway]
-    API <-->|SQLAlchemy ORM| DB[(SQLite / PostgreSQL DB)]
-    API -.->|Ingests| Resource[backend/app/resources/*.json]
+    Client[React Frontend (Vite)] -->|HTTP Requests| API[FastAPI Gateway]
+    API -->|JSON Responses| Client
+    API -->|SQL queries| DB[(SQLite / PostgreSQL DB)]
+    DB -->|Data| API
+    API -->|Ingests| Resource[backend/app/resources/*.json]
 ```
 
 ### Relational Database Model
@@ -22,20 +24,20 @@ The relational database structure consists of four core tables:
 
 ```mermaid
 erDiagram
-    USERS ||--|| PROFILES : "has profile"
-    USERS ||--o{ SESSIONS : "creates session"
-    USERS ||--|| NOTIFICATION_SETTINGS : "manages settings"
+    users ||--|| profiles : "has profile"
+    users ||--o{ sessions : "creates session"
+    users ||--|| notification_settings : "manages settings"
 
-    USERS {
+    users {
         int id PK
-        string email UNIQUE
+        string email
         string hashed_password
         boolean is_active
         boolean is_superuser
         datetime created_at
         datetime updated_at
     }
-    PROFILES {
+    profiles {
         int id PK
         int user_id FK
         string first_name
@@ -44,15 +46,15 @@ erDiagram
         string preferred_language
         string skill_level
     }
-    SESSIONS {
+    sessions {
         int id PK
         int user_id FK
-        string session_token UNIQUE
+        string session_token
         datetime expires_at
         string ip_address
         string user_agent
     }
-    NOTIFICATION_SETTINGS {
+    notification_settings {
         int id PK
         int user_id FK
         boolean email_notifications
