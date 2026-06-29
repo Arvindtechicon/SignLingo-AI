@@ -3,7 +3,11 @@ import { Camera, BookOpen, GraduationCap, ShieldCheck } from 'lucide-react';
 
 export default function LandingPage({ onNavigate }) {
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col justify-between">
+    <div className="relative min-h-screen bg-gradient-to-b from-blue-50/40 via-white to-slate-50 text-slate-800 flex flex-col justify-between overflow-hidden">
+      {/* Background decorative blobs */}
+      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-gradient-to-tr from-indigo-200/20 to-blue-200/20 rounded-full blur-3xl pointer-events-none -z-10"></div>
+      <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-gradient-to-tr from-blue-200/10 to-indigo-100/20 rounded-full blur-3xl pointer-events-none -z-10"></div>
+
       {/* Header */}
       <header className="sticky top-4 z-50 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4 w-full">
         <div className="bg-white/80 backdrop-blur-md border border-slate-200/60 py-3.5 px-6 rounded-2xl flex justify-between items-center shadow-sm shadow-indigo-500/5">
