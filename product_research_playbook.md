@@ -124,17 +124,10 @@ erDiagram
 SignLingo AI's development is structured in 4 key milestones, progressing from system foundation to real-time AI classification:
 
 ```mermaid
-gantt
-    title SignLingo AI Implementation Roadmap
-    dateFormat  YYYY-MM-DD
-    section Backend & Core Setup
-    Milestone 1 :active, 2026-06-27, 3d
-    section AI Webcam Sandbox
-    Milestone 2 : 2026-07-01, 4d
-    section Portals & Analytics
-    Milestone 3 : 2026-07-05, 4d
-    section Certificates & Export
-    Milestone 4 : 2026-07-09, 3d
+graph LR
+    M1["Milestone 1<br/>Core Auth & UI (Active)"] --> M2["Milestone 2<br/>AI Webcam HUD"]
+    M2 --> M3["Milestone 3<br/>Feedback & Dashboards"]
+    M3 --> M4["Milestone 4<br/>Certificates & Polish"]
 ```
 
 ### Milestone 1: Project Initialization & Core Setup (Current)
