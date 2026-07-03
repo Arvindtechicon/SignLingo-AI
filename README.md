@@ -36,8 +36,52 @@ graph TD
 ```
 
 ### C. Relational Database Model
-The database contains five core tables, representing user authentication, settings, profiles, session states, and attempt logs:
 
+#### 1. Milestone 1 Relational Database Model (4 Core Tables)
+The initial database structure consist of four core tables:
+```mermaid
+erDiagram
+    users ||--|| profiles : "has profile"
+    users ||--o{ sessions : "creates session"
+    users ||--|| notification_settings : "manages settings"
+
+    users {
+        int id PK
+        string email
+        string hashed_password
+        boolean is_active
+        boolean is_superuser
+        datetime created_at
+        datetime updated_at
+    }
+    profiles {
+        int id PK
+        int user_id FK
+        string first_name
+        string last_name
+        string bio
+        string preferred_language
+        string skill_level
+    }
+    sessions {
+        int id PK
+        int user_id FK
+        string session_token
+        datetime expires_at
+        string ip_address
+        string user_agent
+    }
+    notification_settings {
+        int id PK
+        int user_id FK
+        boolean email_notifications
+        boolean push_notifications
+        boolean weekly_digest
+    }
+```
+
+#### 2. Milestone 2 Relational Database Model (5 Core Tables with Attempt Logs)
+Milestone 2 expands the database schema to introduce the `attempt_logs` table:
 ```mermaid
 erDiagram
     users ||--|| profiles : "has profile"
@@ -90,6 +134,7 @@ erDiagram
         json landmarks_series
     }
 ```
+
 
 ---
 
