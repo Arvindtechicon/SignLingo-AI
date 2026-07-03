@@ -8,8 +8,19 @@ This repository contains the complete codebase for both **Milestone 1: Setup & D
 
 ## 1. System Architecture & Real-Time Data Flow
 
-The platform utilizes a decoupled Client-Server architecture and WebSockets to handle real-time sign recognition:
+### A. High-Level Gateway Architecture
+The platform follows a decoupled Client-Server architecture pattern:
+```mermaid
+graph TD
+    Client["React Frontend (Vite)"] -->|HTTP Requests| API["FastAPI Gateway"]
+    API -->|JSON Responses| Client
+    API -->|SQL queries| DB[("SQLite / PostgreSQL DB")]
+    DB -->|Data| API
+    API -->|Ingests| Resource["backend/app/resources/*.json"]
+```
 
+### B. Real-Time WebSockets Ingestion Flow
+The platform utilizes WebSockets to handle real-time sign recognition:
 ```mermaid
 graph TD
     A[Webcam Feed] -->|Video Frame| B(React Frontend)
@@ -24,8 +35,8 @@ graph TD
     J -->|Accuracy HUD & Corrective Alerts| E
 ```
 
-### Relational Database Model
-The database contains five core tables, representing user authentication, settings, profiles, and attempt logs:
+### C. Relational Database Model
+The database contains five core tables, representing user authentication, settings, profiles, session states, and attempt logs:
 
 ```mermaid
 erDiagram
@@ -39,14 +50,33 @@ erDiagram
         string email
         string hashed_password
         boolean is_active
+        boolean is_superuser
         datetime created_at
+        datetime updated_at
     }
     profiles {
         int id PK
         int user_id FK
         string first_name
         string last_name
+        string bio
+        string preferred_language
         string skill_level
+    }
+    sessions {
+        int id PK
+        int user_id FK
+        string session_token
+        datetime expires_at
+        string ip_address
+        string user_agent
+    }
+    notification_settings {
+        int id PK
+        int user_id FK
+        boolean email_notifications
+        boolean push_notifications
+        boolean weekly_digest
     }
     attempt_logs {
         int id PK
@@ -85,9 +115,17 @@ sequenceDiagram
     else Email Exists
         API-->>Client: 400 Bad Request
     end
+
+    Note over Client, DB: JWT Token Login Flow
+    Client->>API: POST /api/v1/auth/token
+    API->>DB: Query User by email
+    API->>API: Validate password hash via bcrypt
+    API->>API: Generate Access JWT Token (24-hour expiration)
+    API-->>Client: 200 OK (access_token)
 ```
 
 ---
+
 
 ## 3. Tech Stack
 
