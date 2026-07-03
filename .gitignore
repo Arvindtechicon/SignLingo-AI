@@ -22,6 +22,11 @@ frontend/.next/
 .DS_Store
 Thumbs.db
 
-# Presentation Files
+# Presentation & Documentation Files
 milestone_1_presentation.md
 milestone_1_presentation.pptx
+milestone_2_presentation.md
+milestone_2_presentation_v2.pptx
+MILESTONE_2_DOCUMENTATION.md
+dataset_research_report.md
+product_research_playbook.md
