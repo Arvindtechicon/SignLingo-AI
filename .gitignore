@@ -1,0 +1,27 @@
+# Python
+backend/.venv/
+backend/venv/
+backend/__pycache__/
+backend/*.pyc
+backend/test.db
+
+# Node.js
+frontend/node_modules/
+frontend/dist/
+frontend/.svelte-kit/
+frontend/.next/
+
+# IDEs & System
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+Thumbs.db
+
+# Presentation Files
+milestone_1_presentation.md
+milestone_1_presentation.pptx
