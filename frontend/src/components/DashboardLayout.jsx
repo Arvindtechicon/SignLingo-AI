@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { CameraFeed } from './CameraFeed';
+
 import { 
   LayoutDashboard, 
   BookOpen, 
@@ -17,6 +19,8 @@ import {
 export default function DashboardLayout({ onLogout }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('profile');
+  const [selectedSign, setSelectedSign] = useState('A');
+
 
   // Profile Settings States
   const [firstName, setFirstName] = useState('User');
@@ -304,6 +308,70 @@ export default function DashboardLayout({ onLogout }) {
                   </div>
 
                 </form>
+              </div>
+            </div>
+          ) : activeTab === 'sandbox' ? (
+            <div className="space-y-6">
+              <div>
+                <h2 className="text-2xl font-bold text-slate-900">Practice Sandbox</h2>
+                <p className="text-slate-500 text-sm mt-0.5">Practice ASL letters and words with real-time AI skeleton overlays and accuracy metrics.</p>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+                {/* Left Card: Reference & Instructions */}
+                <div className="lg:col-span-1 bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm shadow-indigo-500/5 space-y-6">
+                  <div>
+                    <h3 className="text-lg font-bold text-slate-900">Reference Guidelines</h3>
+                    <p className="text-slate-500 text-xs mt-0.5">Select a target sign and align your movements.</p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">Select Sign to Practice</label>
+                    <select 
+                      value={selectedSign}
+                      onChange={(e) => setSelectedSign(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3.5 text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition text-sm font-medium"
+                    >
+                      <optgroup label="Alphabet (Static)">
+                        {['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'].map(l => (
+                          <option key={l} value={l}>Letter {l}</option>
+                        ))}
+                      </optgroup>
+
+                      <optgroup label="Words (Dynamic)">
+                        {['drink', 'help', 'no', 'yes', 'eat', 'friend', 'happy', 'more', 'please', 'sad', 'sorry', 'hello', 'goodbye'].map(w => (
+                          <option key={w} value={w}>{w.charAt(0).toUpperCase() + w.slice(1)}</option>
+                        ))}
+                      </optgroup>
+                    </select>
+                  </div>
+
+                  <div className="border-t border-slate-100 pt-4 space-y-3">
+                    <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Visual Guide</h4>
+                    <div className="aspect-[4/3] w-full bg-slate-50 border border-slate-200/80 rounded-xl flex items-center justify-center text-slate-400 font-bold text-sm">
+                      <span className="text-indigo-600 text-lg font-extrabold">ASL: {selectedSign}</span>
+                    </div>
+                  </div>
+
+                  <div className="bg-slate-50 rounded-xl p-4 border border-slate-200/60 space-y-2">
+                    <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Practice Guidelines</h4>
+                    <ul className="text-xs text-slate-600 space-y-1.5 list-disc pl-4">
+                      <li>Position your hand inside the camera bounding box.</li>
+                      <li>For letters: hold the shape steady and press <strong>Analyze Sign</strong>.</li>
+                      <li>For words: press <strong>Record Attempt</strong>, perform the movement, and then press <strong>Analyze Sign</strong>.</li>
+                      <li>Keep background lighting clear to assist joint tracking.</li>
+                    </ul>
+                  </div>
+                </div>
+
+                {/* Right Card: Webcam Feed */}
+                <div className="lg:col-span-2 bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm shadow-indigo-500/5">
+                  <CameraFeed 
+                    userId="1" 
+                    signId={selectedSign} 
+                    onAssessmentCompleted={(res) => console.log("Assessment completed:", res)} 
+                  />
+                </div>
               </div>
             </div>
           ) : (

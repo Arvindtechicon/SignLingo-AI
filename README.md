@@ -2,64 +2,62 @@
 
 SignLingo AI is a modern web application designed to help users master American Sign Language (ASL) with real-time AI-based feedback. 
 
-This repository contains the complete codebase for **Milestone 1: Project Initialization, Design Process & Core Setup**.
+This repository contains the complete codebase for both **Milestone 1: Setup & Design** and **Milestone 2: Gesture Recognition & Assessment**.
 
 ---
 
-## 1. System Architecture
+## 1. System Architecture & Real-Time Data Flow
 
-The platform follows a decoupled Client-Server architecture pattern:
+The platform utilizes a decoupled Client-Server architecture and WebSockets to handle real-time sign recognition:
 
 ```mermaid
 graph TD
-    Client["React Frontend (Vite)"] -->|HTTP Requests| API["FastAPI Gateway"]
-    API -->|JSON Responses| Client
-    API -->|SQL queries| DB[("SQLite / PostgreSQL DB")]
-    DB -->|Data| API
-    API -->|Ingests| Resource["backend/app/resources/*.json"]
+    A[Webcam Feed] -->|Video Frame| B(React Frontend)
+    B -->|Sequential Processing| C[MediaPipe Hands & Pose WASM]
+    C -->|Coordinates Payload| E[WebSocket Client]
+    E -->|High-Frequency Stream| F[FastAPI WebSocket Router]
+    F -->|Frame Queue Ingestion| G[Session State Manager]
+    G -->|On Stop Recording| H[Assessment Engine]
+    H -->|Templates Cache| I[(JSON Templates)]
+    H -->|Cosine + Procrustes + DTW| J[Assessment Evaluator]
+    J -->|Log Attempt| K[(SQLite / PostgreSQL DB)]
+    J -->|Accuracy HUD & Corrective Alerts| E
 ```
 
 ### Relational Database Model
-The relational database structure consists of four core tables:
+The database contains five core tables, representing user authentication, settings, profiles, and attempt logs:
 
 ```mermaid
 erDiagram
     users ||--|| profiles : "has profile"
     users ||--o{ sessions : "creates session"
     users ||--|| notification_settings : "manages settings"
+    users ||--o{ attempt_logs : "records attempt"
 
     users {
         int id PK
         string email
         string hashed_password
         boolean is_active
-        boolean is_superuser
         datetime created_at
-        datetime updated_at
     }
     profiles {
         int id PK
         int user_id FK
         string first_name
         string last_name
-        string bio
-        string preferred_language
         string skill_level
     }
-    sessions {
+    attempt_logs {
         int id PK
         int user_id FK
-        string session_token
-        datetime expires_at
-        string ip_address
-        string user_agent
-    }
-    notification_settings {
-        int id PK
-        int user_id FK
-        boolean email_notifications
-        boolean push_notifications
-        boolean weekly_digest
+        string sign_id
+        float score
+        boolean is_correct
+        text feedback
+        float duration_seconds
+        datetime timestamp
+        json landmarks_series
     }
 ```
 
@@ -67,7 +65,7 @@ erDiagram
 
 ## 2. Authentication & Data Flow
 
-Authentication is built using standard OAuth2 routes with JSON Web Tokens (JWT) and direct `bcrypt` password hashing for optimal database security.
+Authentication is built using standard OAuth2 routes with JSON Web Tokens (JWT) and direct `bcrypt` password hashing.
 
 ```mermaid
 sequenceDiagram
@@ -85,44 +83,39 @@ sequenceDiagram
         DB-->>API: Commit Transaction
         API-->>Client: 201 Created (Success)
     else Email Exists
-        API-->>Client: 400 Bad Request (Duplicate Error)
+        API-->>Client: 400 Bad Request
     end
-
-    Note over Client, DB: JWT Token Login Flow
-    Client->>API: POST /api/v1/auth/token
-    API->>DB: Query User by email
-    API->>API: Validate password hash via bcrypt
-    API->>API: Generate Access JWT Token (24-hour expiration)
-    API-->>Client: 200 OK (access_token)
 ```
 
 ---
 
 ## 3. Tech Stack
 
-- **Frontend**: React (v18), Vite, Tailwind CSS, Lucide Icons, React Router DOM.
-- **Backend API**: FastAPI (Python 3.11), Uvicorn.
+- **Frontend**: React (v18), Vite, Tailwind CSS, Lucide Icons, `@mediapipe/hands`, `@mediapipe/pose`, `react-webcam`.
+- **Backend API**: FastAPI (Python 3.11), Uvicorn, WebSockets.
+- **Data Science**: NumPy, SciPy (v1.12+).
 - **Database ORM**: SQLAlchemy (v2).
-- **Security & Crypto**: PyJWT, Bcrypt.
+- **Security**: PyJWT, Bcrypt.
 - **Unit Testing**: Pytest, HTTPX, FastAPI TestClient.
 
 ---
 
-## 4. Milestone 1 Completed Features
+## 4. Completed Milestone Features
 
-### Backend Components
-- **Config & Core Settings**: Handled using `pydantic-settings` to dynamically parse environment variables from `.env`.
-- **Database Sessions**: Configured database engine routing and connection pooling in `app/db/session.py`.
-- **Relational Schemas**: Created model schemas for User accounts, Profiles, Session histories, and Notification preferences.
-- **Security Utilities**: Set up token creation utilities and direct bcrypt hashing wrappers in `app/core/security.py`.
-- **Auth Routes**: Built and tested endpoint controllers for `/register` and `/token` JWT logins.
+### Milestone 1: Core Setup & Authentication
+- **Database Pooling**: Dynamic ORM session handling with an automatic local SQLite (`test.db`) fallback if PostgreSQL is offline.
+- **User Dashboard**: Left sidebar layout featuring proficiency toggles, sliding stats, and role selectors.
+- **JWT Auth**: Full OAuth2 flow (register/login) protecting user sessions.
 
-### Frontend Components
-- **Off-White Design System**: Set up slate-50 (`#F8FAFC`) styling using Tailwind configurations.
-- **Landing Page**: Implemented a responsive header navigation, hero banner section, and landing feature grids.
-- **Login & Registration forms**: Developed responsive visual input fields with custom state validations.
-- **Role Selector Grid**: Configured an interactive 2x2 grid letting users select their account roles (*Learner, Instructor, Accessibility Trainer, Admin*) with scale animations.
-- **Dashboard Sidebar Shell**: Designed a responsive layout featuring menu indicator lines, notification bell center, initials-based user avatar, and a profile management center with proficiency toggle chips and hour sliders.
+### Milestone 2: Gesture Recognition & Assessment
+- **Real-Time Hand Overlay**: Integrates `@mediapipe/hands` to track wrist, palm base, and 21 finger joints.Skeletons are overlayed using a cobalt-blue and emerald-green coordinate map.
+- **Upper Body Pose tracking**: Integrates `@mediapipe/pose` sequentially to track shoulders, elbows, and arms, rendering them in violet.
+- **Camera Controls**: Interactive camera **Enable/Disable** buttons with visual placeholder cards.
+- **Pattern Matching Algorithms**:
+  - **Cosine Similarity**: Identifies coordinate angle directions.
+  - **Procrustes Shape Comparison**: Scale, translation, and rotation-invariant shape distance mapping.
+  - **Dynamic Time Warping (DTW)**: Movement velocity matching for gesture sequences (e.g. dynamic words).
+- **Corrective HUD Alerts**: Direct vector pointing evaluation (MCP to Tip) showing user exactly which finger needs correction.
 
 ---
 
@@ -131,38 +124,33 @@ sequenceDiagram
 ### A. Run Backend API
 Navigate to the `/backend` directory:
 ```powershell
-# Initialize Python virtual environment
 python -m venv .venv
 .\.venv\Scripts\activate
-
-# Install dependencies
 pip install -r requirements.txt
-
-# Run development server
-uvicorn app.main:app --reload --port 8000
+python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
 ```
-API docs will be available at [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs).
 
 ### B. Run Backend Tests
-Run the test suite from the `/backend` directory:
+Run the pytest suite to verify routers, buffers, databases, and assessment engines:
 ```powershell
-.\.venv\Scripts\pytest tests/
+.\.venv\Scripts\pytest -v
 ```
 
-### C. Run Frontend Dev Server
+### C. Run Template & Ingestion Simulation Scripts
+To verify coordinate reference files or run a dynamic mock ingestion simulation:
+```powershell
+# Verify templates loading
+python app/scripts/verify_templates.py
+
+# Simulate perfect "drink" sequence stream (outputs 100%)
+python app/scripts/test_dynamic_simulate.py
+```
+
+### D. Run Frontend Dev Server
 Navigate to the `/frontend` directory:
 ```powershell
-# Install packages
 npm install
-
-# Start local server
 npm run dev
 ```
 Open [http://localhost:5173](http://localhost:5173) in your browser.
 
-### D. Compile Frontend Build
-Run from the `/frontend` directory:
-```powershell
-npm run build
-```
-The optimized bundle will be compiled into `frontend/dist/`.

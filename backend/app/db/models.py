@@ -1,6 +1,8 @@
 import datetime
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey, Text
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey, Text, Float
 from sqlalchemy.orm import relationship, declarative_base
+from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.types import JSON
 
 Base = declarative_base()
 
@@ -18,6 +20,7 @@ class User(Base):
     profile = relationship("Profile", back_populates="user", uselist=False, cascade="all, delete-orphan")
     sessions = relationship("Session", back_populates="user", cascade="all, delete-orphan")
     notification_settings = relationship("NotificationSettings", back_populates="user", uselist=False, cascade="all, delete-orphan")
+    attempts = relationship("AttemptLog", back_populates="user", cascade="all, delete-orphan")
 
 
 class Profile(Base):
@@ -63,3 +66,23 @@ class NotificationSettings(Base):
     updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
 
     user = relationship("User", back_populates="notification_settings")
+
+
+class AttemptLog(Base):
+    __tablename__ = "attempt_logs"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    sign_id = Column(String(100), nullable=False)  # target sign name, e.g., "sign_A"
+    score = Column(Float, nullable=False)
+    is_correct = Column(Boolean, default=False)
+    feedback = Column(String(500), nullable=True)
+    duration_seconds = Column(Float, nullable=True)
+    timestamp = Column(DateTime, default=datetime.datetime.utcnow)
+    
+    # High-frequency JSONB column containing coordinates trace data
+    # Structure matches: [{"timestamp_offset": float, "hands": [...], "pose": [...]}]
+    landmarks_series = Column(JSONB().with_variant(JSON, "sqlite"), nullable=True)
+
+    user = relationship("User", back_populates="attempts")
+
