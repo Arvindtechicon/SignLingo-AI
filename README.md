@@ -95,8 +95,8 @@ erDiagram
 
 ## 2. Authentication & Data Flow
 
-Authentication is built using standard OAuth2 routes with JSON Web Tokens (JWT) and direct `bcrypt` password hashing.
-
+### A. Registration & Session Authentication Flow (Milestone 1)
+Shows the user signup and OAuth2 JWT authentication flow:
 ```mermaid
 sequenceDiagram
     autonumber
@@ -124,7 +124,37 @@ sequenceDiagram
     API-->>Client: 200 OK (access_token)
 ```
 
+### B. WebSockets Gesture Ingestion & Assessment Flow (Milestone 2)
+Shows the real-time coordinate streaming, buffering, and AI evaluation sequence:
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Client as Client (React/Webcam)
+    participant WS as FastAPI WebSocket Router
+    participant Engine as Assessment Engine
+    participant DB as Database
+
+    Note over Client, WS: Establish Session
+    Client->>WS: Connect to /ws/{user_id}/{sign_id}
+    WS-->>Client: Connection Accepted (Connected status)
+
+    Note over Client, WS: Stream Coordinates
+    Client->>Client: Capture camera frame & track landmarks
+    Client->>WS: Stream FRAME payload (timestamp, hands, pose points)
+    WS->>WS: Buffer frames in session queue (max 90 frames)
+
+    Note over Client, WS: Trigger Assessment
+    Client->>WS: Send STOP_RECORDING
+    WS->>Engine: Run evaluation (Cosine + Procrustes + DTW)
+    Engine->>Engine: Calculate accuracy & finger corrective offsets
+    Engine->>DB: Log attempt (score, correct, feedback, landmarks_series)
+    DB-->>Engine: Commit transaction
+    Engine-->>WS: Return result payload
+    WS-->>Client: Send ASSESSMENT_RESULT (score, is_correct, feedback)
+```
+
 ---
+
 
 
 ## 3. Tech Stack
