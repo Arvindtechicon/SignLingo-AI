@@ -259,17 +259,7 @@ python app/scripts/verify_templates.py
 python app/scripts/test_dynamic_simulate.py
 ```
 
-### D. Run Weekend Sprint AI Utilities
-To run the local academic Python scripts and generate report/capture files:
-```powershell
-# 1. Generate the ASL Alphabet dataset report (exports asl_dataset_report.csv)
-python backend/app/scripts/dataset_explorer.py
-
-# 2. Open the local Python webcam hand tracker (press 'S' to save JSON, 'Q' to quit)
-python backend/app/ai/hand_tracking/hand_tracker.py
-```
-
-### E. Run Frontend Dev Server
+### D. Run Frontend Dev Server
 Navigate to the `/frontend` directory:
 ```powershell
 npm install
